@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demande Clé Bêta</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      text-align: center; 
+      background: #1a1a2e; 
+      color: white; 
+      padding: 20px; 
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    input, textarea { 
+      width: 90%; 
+      padding: 12px; 
+      margin: 10px auto; 
+      border-radius: 8px; 
+      border: none; 
+      display: block;
+    }
+    button { 
+      background: #5865F2; 
+      color: white; 
+      padding: 15px; 
+      font-size: 18px; 
+      border: none; 
+      border-radius: 10px; 
+      width: 90%; 
+      cursor: pointer;
+      margin: 15px auto;
+      display: block;
+    }
+    button:hover { background: #4752C4; }
+    .info { font-size: 14px; color: #aaa; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Demande de Clé Bêta</h1>
+  <p class="info">Tous les champs sont obligatoires</p>
+
+  <input type="text" id="pseudo" placeholder="Pseudo" />
+  <input type="text" id="discord_id" placeholder="Ton ID Discord (clic droit → Copier ID)" />
+  <input type="text" id="steam" placeholder="Lien Steam (https://steamcommunity.com/id/...)" />
+  <textarea id="exp" placeholder="decriver l'experience que vous avez" rows="3"></textarea>
+
+  <button onclick="envoyer()">Envoyer la demande</button>
+
+  <script>
+    async function envoyer() {
+      const pseudo = document.getElementById('pseudo').value.trim();
+      const discordId = document.getElementById('discord_id').value.trim();
+      const steam = document.getElementById('steam').value.trim();
+      const exp = document.getElementById('exp').value.trim() || "Aucune";
+
+      if (!pseudo || !discordId || !steam) {
+        alert("Remplis tous les champs obligatoires !");
+        return;
+      }
+
+      const webhook = "https://discord.com/api/webhooks/1439514316872093696/Y5vTV2l20KWsclnzY_23bMoh1VmCMlFittCszy6xdy9OWB0LYtncYWHs97FioOTJEIGT";
+
+      const uniqueId = Date.now();
+
+      await fetch(webhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          embeds: [{
+            title: "Nouvelle Demande de Clé Bêta",
+            color: 3447003,
+            fields: [
+              { name: "Pseudo", value: pseudo, inline: true },
+              { name: "Discord ID", value: `<@${discordId}>`, inline: true },
+              { name: "Steam", value: `[Profil](${steam})`, inline: true },
+              { name: "Expérience", value: exp }
+            ],
+            timestamp: new Date().toISOString(),
+            footer: { text: `ID: ${uniqueId}` }
+          }],
+          components: [{
+            type: 1,
+            components: [
+              {
+                type: 2,
+                label: "Accepter",
+                style: 3, // Vert
+                custom_id: `accept_${uniqueId}_${discordId}`
+              },
+              {
+                type: 2,
+                label: "Refuser",
+                style: 4, // Rouge
+                custom_id: `refuse_${uniqueId}_${discordId}`
+              }
+            ]
+          }]
+        })
+      });
+
+      alert("Demande envoyée ! Un admin va te répondre.");
+      document.getElementById('pseudo').value = '';
+      document.getElementById('discord_id').value = '';
+      document.getElementById('steam').value = '';
+      document.getElementById('exp').value = '';
+    }
+  </script>
+</body>
+</html>
